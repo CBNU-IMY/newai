@@ -1,7 +1,7 @@
 import os
-from model.chatbot.kogpt2 import chatbot as ch_kogpt2
+#from model.chatbot.kogpt2 import chatbot as ch_kogpt2
 from model.chatbot.kobert import chatbot as ch_kobert
-from model.emotion import service as emotion
+#from model.emotion import service as emotion
 from util.emotion import Emotion
 from util.depression import Depression
 from flask import Flask, request, jsonify
@@ -9,6 +9,7 @@ from werkzeug.exceptions import BadRequest
 from kss import split_sentences
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
 Emotion = Emotion()
 Depression = Depression()
 

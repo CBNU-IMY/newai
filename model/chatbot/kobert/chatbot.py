@@ -14,10 +14,10 @@ def load_wellness_data():
     emotion_path = f"{root_path}/data/wellness_dialog_emotion.txt"
     depression_path = f"{root_path}/data/wellness_dialog_depression.txt"
 
-    c_f = open(category_path, 'r')
-    a_f = open(answer_path, 'r')
-    e_f = open(emotion_path, 'r')
-    d_f = open(depression_path, 'r')
+    c_f = open(category_path, 'r', encoding='UTF8')
+    a_f = open(answer_path, 'r', encoding='UTF8')
+    e_f = open(emotion_path, 'r', encoding='UTF8')
+    d_f = open(depression_path, 'r', encoding='UTF8')
 
     category_lines = c_f.readlines()
     answer_lines = a_f.readlines()
