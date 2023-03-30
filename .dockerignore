@@ -1,0 +1,16 @@
+.git
+.gitignore
+.idea
+.cache
+.DS_Store
+
+__pycache__
+Scripts
+Lib
+
+*.md
+*.cfg
+
+preprocess
+*/__pycache__/*
+checkpoint/emotion_pn_v5.pth
