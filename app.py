@@ -7,9 +7,20 @@ from util.depression import Depression
 from flask import Flask, request, jsonify
 from werkzeug.exceptions import BadRequest
 from kss import split_sentences
+from config import *
+import mysql.connector
+import datetime
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
+db = mysql.connector.connect(
+    host=mysql_host,
+    user=mysql_user,
+    password=mysql_password,
+    database=mysql_database
+)
+cursor = db.cursor()
+
 Emotion = Emotion()
 Depression = Depression()
 
@@ -88,12 +99,24 @@ def reactChatbotV2():
         })
 
     answer, category, desc, softmax = ch_kobert.chat(sentence)
+    if(desc[0:2]=="감정"):
+        store_emotion(desc.split('/')[1])
     return jsonify({
         "answer": answer,
         "category": category,
         "category_info": desc
     })
 
+def store_emotion(category_info):
+    data = request.json
+    emotion = category_info
+    current_datetime = datetime.datetime.now()
+    
+    # Insert the emotion value into the table
+    #insert_query = "INSERT INTO emotions2 (date, emotion) VALUES (CURDATE(), %s)"
+    insert_query = "INSERT INTO emotions2 (date, emotion) VALUES (%s, %s)"
+    cursor.execute(insert_query, (current_datetime,emotion))
+    db.commit()
 
 def predictDiary(s):
     total_cnt = 0.0
