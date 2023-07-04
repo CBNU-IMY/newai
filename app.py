@@ -24,6 +24,8 @@ cursor = db.cursor()
 Emotion = Emotion()
 Depression = Depression()
 
+
+
 @app.route('/')
 def hello():
     return "deep learning server is running 💗"
@@ -99,6 +101,7 @@ def reactChatbotV2():
         })
 
     answer, category, desc, softmax = ch_kobert.chat(sentence)
+    print("감정/걱정/암".split("/")[1])
     if(desc[0:2]=="감정"):
         store_emotion(desc.split('/')[1])
     return jsonify({
@@ -117,6 +120,20 @@ def store_emotion(category_info):
     insert_query = "INSERT INTO emotions2 (date, emotion) VALUES (%s, %s)"
     cursor.execute(insert_query, (current_datetime,emotion))
     db.commit()
+
+@app.route('/api/emotions', methods=['GET', 'POST'])
+def inquire_emotions():
+    select_query = "SELECT * FROM emotions2 ORDER BY date DESC"
+    cursor.execute(select_query)
+    results = cursor.fetchall()
+
+    emotions = []
+    for row in results:
+        date = row[1]
+        emotion = row[2]
+        emotions.append({'date': date, 'emotion': emotion})
+
+    return jsonify(emotions)
 
 def predictDiary(s):
     total_cnt = 0.0
