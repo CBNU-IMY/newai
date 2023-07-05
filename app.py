@@ -126,7 +126,7 @@ def store_emotion(category_info):
     cursor.execute(insert_query, (current_datetime,emotion))
     db.commit()
 
-@app.route('/api/emotions', methods=['GET', 'POST'])
+@app.route('/emotions', methods=['GET', 'POST'])
 def inquire_emotions():
     select_query = "SELECT * FROM emotions2 ORDER BY date DESC"
     cursor.execute(select_query)
@@ -140,8 +140,10 @@ def inquire_emotions():
 
     return jsonify(emotions)
 
-@app.route('/api/emotions/count', methods=['GET', 'POST'])
+@app.route('/emotions/count', methods=['GET', 'POST'])
 def count_emotions():
+    month= request.args.get('month') # 월별 데이터를 조회하기 위한 매개변수
+    print(month)
     select_query = "SELECT * FROM emotions2 ORDER BY date DESC"
     cursor.execute(select_query)
     results = cursor.fetchall()
@@ -169,6 +171,39 @@ def count_emotions():
                            '기쁨':joy, '불안':anxiety, '당황':embarrassment})
 
     return jsonify(emotions_count)
+
+@app.route('/emotions/count/month', methods=['GET', 'POST'])
+def count_emotions_month():
+    data = request.get_json()  # Get the JSON data from the request body
+    month = data.get('month')  # Retrieve the 'month' value from the JSON data
+    print(month)
+    select_query = "SELECT * FROM emotions2 WHERE MONTH(date) = %s ORDER BY date DESC"
+    cursor.execute(select_query, (month,))
+    results = cursor.fetchall()
+
+    emotions = []
+    emotions_count = []
+    anger, sad, joy, embarrassment, anxiety = 0, 0, 0, 0, 0
+    for row in results:
+        date = row[1]
+        emotion = row[2]
+        emotions.append({'date': date, 'emotion': emotion})
+
+    for entry in emotions:
+        if entry['emotion'] in ANGER:
+            anger += 1
+        elif entry['emotion'] in SAD:
+            sad += 1
+        elif entry['emotion'] in JOY:
+            joy += 1
+        elif entry['emotion'] in ANXIETY:
+            anxiety += 1 
+        elif entry['emotion'] in EMBARRASSMENT:
+            embarrassment += 1
+    emotions_count.append({'분노': anger, '우울': sad, '기쁨': joy, '불안': anxiety, '당황': embarrassment})
+
+    return jsonify(emotions_count)
+
 
 def predictDiary(s):
     total_cnt = 0.0
