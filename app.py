@@ -15,6 +15,7 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 db = mysql.connector.connect(
     host=mysql_host,
+    port=mysql_port,
     user=mysql_user,
     password=mysql_password,
     database=mysql_database
@@ -121,14 +122,14 @@ def store_emotion(category_info):
     current_datetime = datetime.datetime.now()
     
     # Insert the emotion value into the table
-    #insert_query = "INSERT INTO emotions2 (date, emotion) VALUES (CURDATE(), %s)"
-    insert_query = "INSERT INTO emotions2 (date, emotion) VALUES (%s, %s)"
+    #insert_query = "INSERT INTO emotions (date, emotion) VALUES (CURDATE(), %s)"
+    insert_query = "INSERT INTO emotions (date, emotion) VALUES (%s, %s)"
     cursor.execute(insert_query, (current_datetime,emotion))
     db.commit()
 
 @app.route('/emotions', methods=['GET', 'POST'])
 def inquire_emotions():
-    select_query = "SELECT * FROM emotions2 ORDER BY date DESC"
+    select_query = "SELECT * FROM emotions ORDER BY date DESC"
     cursor.execute(select_query)
     results = cursor.fetchall()
 
@@ -144,7 +145,7 @@ def inquire_emotions():
 def count_emotions():
     month= request.args.get('month') # 월별 데이터를 조회하기 위한 매개변수
     print(month)
-    select_query = "SELECT * FROM emotions2 ORDER BY date DESC"
+    select_query = "SELECT * FROM emotions ORDER BY date DESC"
     cursor.execute(select_query)
     results = cursor.fetchall()
 
@@ -177,7 +178,7 @@ def count_emotions_month():
     data = request.get_json()  # Get the JSON data from the request body
     month = data.get('month')  # Retrieve the 'month' value from the JSON data
     print(month)
-    select_query = "SELECT * FROM emotions2 WHERE MONTH(date) = %s ORDER BY date DESC"
+    select_query = "SELECT * FROM emotions WHERE MONTH(date) = %s ORDER BY date DESC"
     cursor.execute(select_query, (month,))
     results = cursor.fetchall()
 
