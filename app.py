@@ -29,7 +29,7 @@ ANXIETY=['감정조절이상','걱정','공포','과민반응','긴장','두려�
 SAD=['고독감','공허감','괴로움','기분저하','눈물','멍함','무력감','부정적사고','서운함','속상함','슬픔','외로움','우울감','의기소침','의욕상실','자괴감','자살충동','자신감저하','자존감저하',
      '절망감','좌절','창피함','초조함','통제력상실','허무함','힘듦']
 ANGER=['미움','배신감','분노','불만','불신','짜증','화']
-Embarrassment=['곤혹감','기시감','당황']
+EMBARRASSMENT=['곤혹감','기시감','당황']
 
 @app.route('/')
 def hello():
@@ -139,6 +139,36 @@ def inquire_emotions():
         emotions.append({'date': date, 'emotion': emotion})
 
     return jsonify(emotions)
+
+@app.route('/api/emotions/count', methods=['GET', 'POST'])
+def count_emotions():
+    select_query = "SELECT * FROM emotions2 ORDER BY date DESC"
+    cursor.execute(select_query)
+    results = cursor.fetchall()
+
+    emotions = []
+    emotions_count= []
+    anger, sad, joy, embarrassment, anxiety=0,0,0,0,0
+    for row in results:
+        date = row[1]
+        emotion = row[2]
+        emotions.append({'date': date, 'emotion': emotion})
+    
+    for entry in emotions:
+        if entry['emotion'] in ANGER:
+            anger+=1
+        elif entry['emotion'] in SAD:
+            sad+=1
+        elif entry['emotion'] in JOY:
+            joy+=1
+        elif entry['emotion'] in ANXIETY:
+            anxiety+=1 
+        elif entry['emotion'] in EMBARRASSMENT:
+            embarrassment+=1
+    emotions_count.append({'분노':anger, '우울': sad,
+                           '기쁨':joy, '불안':anxiety, '당황':embarrassment})
+
+    return jsonify(emotions_count)
 
 def predictDiary(s):
     total_cnt = 0.0
