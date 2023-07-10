@@ -122,10 +122,28 @@ def store_emotion(category_info):
     current_datetime = datetime.datetime.now()
     current_month = current_datetime.month
     current_year = current_datetime.year
-    
 
-    insert_query = "INSERT INTO emotions (date, emotion) VALUES (%s, %s)"
-    cursor.execute(insert_query, (current_datetime,emotion))
+    if emotion in ANGER:
+        emotion="anger"
+    elif emotion in SAD:
+        emotion="sad"
+    elif emotion in JOY:
+        emotion="joy"
+    elif emotion in ANXIETY:
+        emotion="anxiety"
+    elif emotion in EMBARRASSMENT:
+        emotion="embarrassment"
+
+    print(emotion)
+
+    select_query = "SELECT * FROM emotions3 WHERE (month)= %s AND (year)=%s AND (emotion) = %s"
+    cursor.execute(select_query, (current_month,current_year,emotion))
+    results = cursor.fetchall()
+    count=results[0][3]
+
+
+    update_query = "UPDATE emotions3 SET count=%s WHERE month= %s AND year=%s AND emotion = %s;"
+    cursor.execute(update_query, (count+1,current_month,current_year,emotion))
     db.commit()
 
 @app.route('/emotions', methods=['GET', 'POST'])
