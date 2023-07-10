@@ -120,9 +120,10 @@ def store_emotion(category_info):
     data = request.json
     emotion = category_info
     current_datetime = datetime.datetime.now()
+    current_month = current_datetime.month
+    current_year = current_datetime.year
     
-    # Insert the emotion value into the table
-    #insert_query = "INSERT INTO emotions (date, emotion) VALUES (CURDATE(), %s)"
+
     insert_query = "INSERT INTO emotions (date, emotion) VALUES (%s, %s)"
     cursor.execute(insert_query, (current_datetime,emotion))
     db.commit()
