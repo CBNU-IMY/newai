@@ -25,11 +25,11 @@ cursor = db.cursor()
 Emotion = Emotion()
 Depression = Depression()
 
-JOY=['즐거움']
-ANXIETY=['감정조절이상','걱정','공포','과민반응','긴장','두려움','무서움','불안감','불쾌감','불편감']
+JOY=['즐거움', '기쁨']
+ANXIETY=['감정조절이상','걱정','공포','과민반응','긴장','두려움','무서움','불안감','불쾌감','불편감', '불안']
 SAD=['고독감','공허감','괴로움','기분저하','눈물','멍함','무력감','부정적사고','서운함','속상함','슬픔','외로움','우울감','의기소침','의욕상실','자괴감','자살충동','자신감저하','자존감저하',
-     '절망감','좌절','창피함','초조함','통제력상실','허무함','힘듦']
-ANGER=['미움','배신감','분노','불만','불신','짜증','화']
+     '절망감','좌절','창피함','초조함','통제력상실','허무함','힘듦', '우울']
+ANGER=['미움','배신감','분노','불만','불신','짜증','화', '분노']
 EMBARRASSMENT=['곤혹감','기시감','당황']
 
 @app.route('/')
@@ -107,7 +107,7 @@ def reactChatbotV2():
         })
 
     answer, category, desc, softmax = ch_kobert.chat(sentence)
-    print("감정/걱정/암".split("/")[1])
+
     if(desc[0:2]=="감정"):
         store_emotion(desc.split('/')[1])
     return jsonify({
@@ -133,9 +133,14 @@ def store_emotion(category_info):
         emotion="anxiety"
     elif emotion in EMBARRASSMENT:
         emotion="embarrassment"
+    else:
+        emotion="nothing"
+
+    if emotion=='nothing':
+        return
 
     print(emotion)
-
+    
     select_query = "SELECT * FROM emotions3 WHERE (month)= %s AND (year)=%s AND (emotion) = %s"
     cursor.execute(select_query, (current_month,current_year,emotion))
     results = cursor.fetchall()
@@ -146,25 +151,24 @@ def store_emotion(category_info):
     cursor.execute(update_query, (count+1,current_month,current_year,emotion))
     db.commit()
 
-@app.route('/emotions', methods=['GET', 'POST'])
-def inquire_emotions():
-    select_query = "SELECT * FROM emotions ORDER BY date DESC"
-    cursor.execute(select_query)
-    results = cursor.fetchall()
+#@app.route('/emotions', methods=['GET', 'POST'])
+#def inquire_emotions():
+#    select_query = "SELECT * FROM emotions ORDER BY date DESC"
+#    cursor.execute(select_query)
+#    results = cursor.fetchall()
 
-    emotions = []
-    for row in results:
-        date = row[1]
-        emotion = row[2]
-        emotions.append({'date': date, 'emotion': emotion})
+#    emotions = []
+#    for row in results:
+#        date = row[1]
+#        emotion = row[2]
+#        emotions.append({'date': date, 'emotion': emotion})
 
-    return jsonify(emotions)
+#    return jsonify(emotions)
 
 @app.route('/emotions/count', methods=['GET', 'POST'])
 def count_emotions():
     month= request.args.get('month') # 월별 데이터를 조회하기 위한 매개변수
-    print(month)
-    select_query = "SELECT * FROM emotions ORDER BY date DESC"
+    select_query = "SELECT * FROM emotions3"
     cursor.execute(select_query)
     results = cursor.fetchall()
 
@@ -172,21 +176,22 @@ def count_emotions():
     emotions_count= []
     anger, sad, joy, embarrassment, anxiety=0,0,0,0,0
     for row in results:
-        date = row[1]
+        month=row[1]
         emotion = row[2]
-        emotions.append({'date': date, 'emotion': emotion})
+        count= row[3]
+        emotions.append({'month': month, 'emotion': emotion, 'count': count})
     
     for entry in emotions:
-        if entry['emotion'] in ANGER:
-            anger+=1
-        elif entry['emotion'] in SAD:
-            sad+=1
-        elif entry['emotion'] in JOY:
-            joy+=1
-        elif entry['emotion'] in ANXIETY:
-            anxiety+=1 
-        elif entry['emotion'] in EMBARRASSMENT:
-            embarrassment+=1
+        if entry['emotion'] == 'anger':
+            anger+=entry['count']
+        elif entry['emotion'] == 'sad':
+            sad+=entry['count']
+        elif entry['emotion'] == 'joy':
+            joy+=entry['count']
+        elif entry['emotion'] == 'anxiety':
+            anxiety+=entry['count']
+        elif entry['emotion'] == 'embarrassment':
+            embarrassment+=entry['count']
     emotions_count.append({'분노':anger, '우울': sad,
                            '기쁨':joy, '불안':anxiety, '당황':embarrassment})
 
@@ -196,8 +201,7 @@ def count_emotions():
 def count_emotions_month():
     data = request.get_json()  # Get the JSON data from the request body
     month = data.get('month')  # Retrieve the 'month' value from the JSON data
-    print(month)
-    select_query = "SELECT * FROM emotions WHERE MONTH(date) = %s ORDER BY date DESC"
+    select_query = "SELECT * FROM emotions3 WHERE month = %s"
     cursor.execute(select_query, (month,))
     results = cursor.fetchall()
 
@@ -205,22 +209,24 @@ def count_emotions_month():
     emotions_count = []
     anger, sad, joy, embarrassment, anxiety = 0, 0, 0, 0, 0
     for row in results:
-        date = row[1]
+        month=row[1]
         emotion = row[2]
-        emotions.append({'date': date, 'emotion': emotion})
+        count= row[3]
+        emotions.append({'month': month, 'emotion': emotion, 'count': count})
 
     for entry in emotions:
-        if entry['emotion'] in ANGER:
-            anger += 1
-        elif entry['emotion'] in SAD:
-            sad += 1
-        elif entry['emotion'] in JOY:
-            joy += 1
-        elif entry['emotion'] in ANXIETY:
-            anxiety += 1 
-        elif entry['emotion'] in EMBARRASSMENT:
-            embarrassment += 1
-    emotions_count.append({'분노': anger, '우울': sad, '기쁨': joy, '불안': anxiety, '당황': embarrassment})
+        if entry['emotion'] == 'anger':
+            anger+=entry['count']
+        elif entry['emotion'] == 'sad':
+            sad+=entry['count']
+        elif entry['emotion'] == 'joy':
+            joy+=entry['count']
+        elif entry['emotion'] == 'anxiety':
+            anxiety+=entry['count']
+        elif entry['emotion'] == 'embarrassment':
+            embarrassment+=entry['count']
+
+    emotions_count.append({'분노': anger, '우울': sad, '기쁨': joy, '불안': anxiety, '당황': embarrassment, '월':month})
 
     return jsonify(emotions_count)
 
