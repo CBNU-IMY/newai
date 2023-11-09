@@ -102,7 +102,7 @@ Depression = Depression()
 
 root_path = '.'
 checkpoint_path = f"{root_path}/checkpoint"
-save_ckpt_path = f"{checkpoint_path}/chatbot_kobert.pth"
+save_ckpt_path = f"{checkpoint_path}/chatbot_kobert(구버전).pth"
 
 # 답변과 카테고리 불러오기
 category, answer, emotion, depression = load_wellness_data()
