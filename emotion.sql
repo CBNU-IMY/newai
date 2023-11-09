@@ -1,3 +1,4 @@
+
 USE flask_chatbot;
 
 CREATE TABLE `emotions3` (
@@ -68,4 +69,5 @@ VALUES
     (2023, 12, 'sad', 0),
     (2023, 12, 'anxiety', 0),
     (2023, 12, 'embarrassment', 0);
+
     
