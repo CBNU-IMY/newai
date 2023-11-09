@@ -1,12 +1,13 @@
-USE flask_test;
 
-CREATE TABLE `emotion3` (
+USE flask_chatbot;
+
+CREATE TABLE `emotions3` (
   `year` SMALLINT NOT NULL,
   `month` TINYINT NOT NULL,
   `emotion` VARCHAR(45) NOT NULL,
   `count` INT NULL,
   PRIMARY KEY (`year`, `month`, `emotion`));
-INSERT INTO new_table (`year`, `month`, `emotion`, `count`)
+INSERT INTO emotions3 (`year`, `month`, `emotion`, `count`)
 VALUES
     (2023, 1, 'joy', 0),
     (2023, 1, 'anger', 0),
@@ -68,4 +69,5 @@ VALUES
     (2023, 12, 'sad', 0),
     (2023, 12, 'anxiety', 0),
     (2023, 12, 'embarrassment', 0);
+
     

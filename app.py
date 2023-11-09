@@ -27,7 +27,8 @@ Depression = Depression()
 
 JOY=['즐거움', '기쁨']
 ANXIETY=['감정조절이상','걱정','공포','과민반응','긴장','두려움','무서움','불안감','불쾌감','불편감', '불안']
-SAD=['고독감','공허감','괴로움','기분저하','눈물','멍함','무력감','부정적사고','서운함','속상함','슬픔','외로움','우울감','의기소침','의욕상실','자괴감','자살충동','자신감저하','자존감저하',
+SAD=['고독감','공허감','괴로움','기분저하','눈물','멍함','무력감','부정적사고','서운함','속상함',
+     '슬픔','외로움','우울감','의기소침','의욕상실','자괴감','자살충동','자신감저하','자존감저하',
      '절망감','좌절','창피함','초조함','통제력상실','허무함','힘듦', '우울']
 ANGER=['미움','배신감','분노','불만','불신','짜증','화', '분노']
 EMBARRASSMENT=['곤혹감','기시감','당황']
@@ -151,19 +152,19 @@ def store_emotion(category_info):
     cursor.execute(update_query, (count+1,current_month,current_year,emotion))
     db.commit()
 
-#@app.route('/emotions', methods=['GET', 'POST'])
-#def inquire_emotions():
-#    select_query = "SELECT * FROM emotions ORDER BY date DESC"
-#    cursor.execute(select_query)
-#    results = cursor.fetchall()
+@app.route('/emotions', methods=['GET', 'POST'])
+def inquire_emotions():
+    select_query = "SELECT * FROM emotions3 ORDER BY date DESC"
+    cursor.execute(select_query)
+    results = cursor.fetchall()
 
-#    emotions = []
-#    for row in results:
-#        date = row[1]
-#        emotion = row[2]
-#        emotions.append({'date': date, 'emotion': emotion})
+    emotions = []
+    for row in results:
+        date = row[1]
+        emotion = row[2]
+        emotions.append({'date': date, 'emotion': emotion})
 
-#    return jsonify(emotions)
+    return jsonify(emotions)
 
 @app.route('/emotions/count', methods=['GET', 'POST'])
 def count_emotions():
